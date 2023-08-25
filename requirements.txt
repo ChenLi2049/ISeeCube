@@ -1,0 +1,11 @@
+torch==1.13.0+cu116
+fastai==2.7.12
+fastcore==1.5.29
+timm==0.4.12
+fastxtend==0.1.4
+polars==0.18.12
+pandas==2.0.3
+scipy==1.8.1
+torchscale==0.2.0
+torchinfo==1.8.0
+tqdm==4.64.0

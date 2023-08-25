@@ -1,4 +1,4 @@
-# from # from https://github.com/DrHB/icecube-2nd-place/tree/main/src/utils.py
+# from https://github.com/DrHB/icecube-2nd-place/tree/main/src/utils.py
 
 import random
 import os
