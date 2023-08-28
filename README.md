@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The goal of this project is to reconstruct the direction of neutrino events detected by [IceCube Neutrino Observatory](https://icecube.wisc.edu/). It is based on the Kaggle competition [IceCube - Neutrinos in Deep Ice](https://www.kaggle.com/competitions/icecube-neutrinos-in-deep-ice).
+The goal of this project is to reconstruct the direction of neutrino events detected by [IceCube Neutrino Observatory](https://icecube.wisc.edu/). It is based on the Kaggle competition [IceCube - Neutrinos in Deep Ice](https://www.kaggle.com/competitions/icecube-neutrinos-in-deep-ice). And the arXiv link is [[2308.13285] Refine Neutrino Events Reconstruction with BEiT-3](https://arxiv.org/abs/2308.13285).
 
 ## Install
 
@@ -97,6 +97,9 @@ Download [pretrained model](https://github.com/ChenLi2049/ISeeCube/releases/tag/
 
 ## Acknowledgements
 
+- Thanks to IceCube and Kaggle for this amazing competition.
 - Lots of code are from [2nd place solution](https://github.com/DrHB/icecube-2nd-place/) in the Kaggle competition. I really appreciate it.
 - Thanks to these repositories: [`torchscale`](https://github.com/microsoft/torchscale), [`graphnet`](https://github.com/graphnet-team/graphnet), [`fastai`](https://github.com/fastai/fastai).
 - Kaggle solutions, discussions and notebooks are helpful.
+- Thanks to [arxiv-style](https://github.com/kourgeorge/arxiv-style) for such a beautiful LaTeX template.
+- Thanks to many other developers and communicators for their dedication.
