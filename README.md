@@ -50,12 +50,6 @@ Now you can run `visualize_dataset.ipynb`.
 
 ## Train
 
-### `train.ipynb`
-
-To train ISeeCube on `batch_1.parquet` for 16 epochs, first create a folder named `BEiT3_29M_MSE_rel128` in the folder of this repository and a empty file named `history.csv` in the created folder, then run `train.ipynb`.
-
-### `train_FULL.py`
-
 1. Download [splitted train_meta](https://www.kaggle.com/datasets/solverworld/train-meta-parquet) and put it in the `data` folder.
 
 2. Download [icecube_transparency](https://www.kaggle.com/datasets/anjum48/icecubetransparency) and put it in the `data` folder.
@@ -85,15 +79,17 @@ data/
     └── train_meta_2.parquet
 ```
 
-To train ISeeCube on about 80 batchs for 8 epochs, First create a folder named `BEiT3_29M_MSE_rel128_FULL` and a empty file named `history.csv` in the created folder, then run this command:
+To train S_RegA model on about 654 epochs divided into 8 epochs, First create a folder named `S_RegA` and a empty file named `history.csv` in the created folder, then run this command:
 
 ```bash
-python train_FULL.py
+python train.py
 ```
+
+You can change the configuration of `train.py` to train a classification model, or load a pre-trained model and finetune it.
 
 ## Predict
 
-Download [pretrained model](https://github.com/ChenLi2049/ISeeCube/releases/tag/v0.0.0) and put it in the `BEiT3_29M_MSE_rel128_FULL`/`models` folder in the folder of this repository. Then run `predict.ipynb`.
+Download [pretrained model](https://github.com/ChenLi2049/ISeeCube/releases/tag/v0.0.1) and put it in the `pretrained_model` folder in the folder of this repository. Then run `predict.ipynb`.
 
 ## Acknowledgements
 

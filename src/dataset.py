@@ -1,24 +1,25 @@
 # edited from https://github.com/DrHB/icecube-2nd-place/blob/main/src/dataset.py
 
-import polars as pl
-import pandas as pd
 import gc, os, random, math
-import numpy as np
 import pickle
-from tqdm.notebook import tqdm
 from collections import OrderedDict
 from bisect import bisect_right
+from typing import (
+    Iterator,
+    Optional,
+    Sized
+)
+
+import polars as pl
+import pandas as pd
+import numpy as np
 from sklearn.preprocessing import RobustScaler
 from scipy.interpolate import interp1d
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
-from typing import (
-    Iterator,
-    Optional,
-    Sized,
-)
 
 
 def prepare_sensors(path):
