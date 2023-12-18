@@ -79,7 +79,7 @@ data/
     └── train_meta_2.parquet
 ```
 
-To train S_RegA model on about 654 epochs divided into 8 epochs, First create a folder named `S_RegA` and a empty file named `history.csv` in the created folder, then run this command:
+To train S_RegA model on about 654 batches divided into 8 epochs, First create a folder named `S_RegA` and a empty file named `history.csv` in the created folder, then run this command:
 
 ```bash
 python train.py
