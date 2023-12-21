@@ -16,7 +16,7 @@ from src.models import (
     IceCubeModel_RegB,
     IceCubeModel_ClsB
 )
-from loss import (
+from src.loss import (
     mse_loss,
     competition_metric_reg,
     loss_comb_reg
