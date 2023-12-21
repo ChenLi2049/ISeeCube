@@ -28,16 +28,17 @@ from fastxtend.vision.all import EMACallback
 
 def train():
     seed_everything(42)
+    L = 196
 
     # load data
-    ds_train = IceCubeCache("data/",mode="train",L=196,selection="total",reduce_size=0.125,)
-    ds_train_len = IceCubeCache("data/",mode="train",L=196,reduce_size=0.125,selection="total",mask_only=True,)
+    ds_train = IceCubeCache("data/",mode="train",L=L,selection="total",reduce_size=0.125,)
+    ds_train_len = IceCubeCache("data/",mode="train",L=L,reduce_size=0.125,selection="total",mask_only=True,)
     sampler_train = RandomChunkSampler(ds_train_len, chunks=ds_train.chunks)
     len_sampler_train = LenMatchBatchSampler(sampler_train, batch_size=32, drop_last=True)
     dl_train = DeviceDataLoader(torch.utils.data.DataLoader(ds_train,batch_sampler=len_sampler_train,num_workers=32,persistent_workers=True,))
 
-    ds_val = IceCubeCache("data/", mode="eval", L=196, selection="total")
-    ds_val_len = IceCubeCache("data/",mode="eval",L=196,selection="total",mask_only=True,)
+    ds_val = IceCubeCache("data/", mode="eval", L=L, selection="total")
+    ds_val_len = IceCubeCache("data/",mode="eval",L=L,selection="total",mask_only=True,)
     sampler_val = torch.utils.data.SequentialSampler(ds_val_len)
     len_sampler_val = LenMatchBatchSampler(sampler_val, batch_size=32, drop_last=True)
     dl_val = DeviceDataLoader(torch.utils.data.DataLoader(ds_val, batch_sampler=len_sampler_val, num_workers=0))
@@ -45,7 +46,7 @@ def train():
     data = DataLoaders(dl_train, dl_val)
 
     # load model
-    model = IceCubeModel_RegA()
+    model = IceCubeModel_RegA(L=L)
     model = nn.DataParallel(model)
     model = model.cuda()
     learn = Learner(

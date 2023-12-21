@@ -79,13 +79,13 @@ data/
     └── train_meta_2.parquet
 ```
 
-To train S_RegA model on about 654 batches divided into 8 epochs, First create a folder named `S_RegA` and a empty file named `history.csv` in the created folder, then run this command:
+To train S_RegA model on about 654 batches divided into 8 epochs, First create a folder named `S_RegA` and an empty file named `history.csv` in the created folder, then run this command:
 
 ```bash
 python train.py
 ```
 
-You can change the configuration of `train.py` to train a classification model, or load a pre-trained model and finetune it.
+You can change the configuration of `train.py` to train a classification model, or load a pre-trained model and finetune it. For `IceCubeModel_RegA`, the 0~32 epochs are trained with `L=196` and the 33∼40 epochs are trained with `L=256`.
 
 ## Predict
 
