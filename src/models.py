@@ -7,6 +7,14 @@ import torch.nn.functional as F
 from torchscale.architecture.config import EncoderConfig
 from torchscale.architecture.encoder import Encoder
 
+class MLP(nn.Sequential):
+    def __init__(self, in_features, hidden_features, out_features):
+        super().__init__()
+        nn.Linear(in_features, hidden_features),
+        nn.LayerNorm(hidden_features),
+        nn.GELU(),
+        nn.Linear(hidden_features, out_features)
+
 class SinusoidalPosEmb(nn.Module):
     def __init__(self, dim=16, M=10000):
         super().__init__()
@@ -23,36 +31,84 @@ class SinusoidalPosEmb(nn.Module):
         return emb
 
 class IceCubeEmbedding(nn.Module):
-    def __init__(self, seq_length=196, hidden_features=2048, out_features=384):
+    def __init__(self, seq_length=196, hidden_features=1536, out_features=384):
         super().__init__()
         self.emb = SinusoidalPosEmb(dim=seq_length)
         self.aux_emb = nn.Embedding(2, seq_length // 2)
         self.emb2 = SinusoidalPosEmb(dim=seq_length // 2)
-        self.proj = nn.Sequential(
-            nn.Linear(6 * seq_length, hidden_features),
-            nn.LayerNorm(hidden_features),
-            nn.GELU(),
-            nn.Linear(hidden_features, out_features),
-        )
+        self.mlp = MLP(6 * seq_length, hidden_features, out_features)
 
     def forward(self, x):
-        pos = x["pos"]
-        charge = x["charge"]
-        time = x["time"]
-        auxiliary = x["auxiliary"]
+        pos, charge, time, auxiliary = x["pos"], x["charge"], x["time"], x["auxiliary"]
         length = torch.log10(x["seq_length_0"].to(dtype=pos.dtype))
 
-        x = torch.cat(
-            [
+        x = torch.cat([
                 self.emb(4096 * pos).flatten(-2),
                 self.emb(1024 * charge),
                 self.emb(4096 * time),
                 self.aux_emb(auxiliary),
                 self.emb2(length).unsqueeze(1).expand(-1, pos.shape[1], -1)
             ],
-            -1,
+            dim=-1
         )
-        x = self.proj(x)
+        x = self.mlp(x)
+        return x
+
+class IceCubeModel(nn.Module):
+    def __init__(self, seq_length=196, mlp_dim=1536, hidden_dim=384, num_register_tokens=3, num_heads=12, num_layers=16, regression_or_classification="regression"):
+        super().__init__()
+        self.icecube_embedding = IceCubeEmbedding(seq_length, mlp_dim, hidden_dim)
+        self.pos_embedding = nn.Parameter(torch.empty(1, seq_length, hidden_dim).normal_(std=0.02), requires_grad=True)
+
+        self.class_token = nn.Parameter(torch.empty(1, 1, hidden_dim), requires_grad=True)
+        self.register_tokens = nn.Parameter(torch.empty(1, num_register_tokens, hidden_dim), requires_grad=True)
+
+        encoder_config = EncoderConfig(
+            encoder_attention_heads=num_heads,
+            encoder_embed_dim=hidden_dim,
+            encoder_ffn_embed_dim=mlp_dim,
+            encoder_layers=num_layers,
+            rel_pos_buckets=32,
+            max_rel_pos=256
+        )
+        self.encoder = Encoder(encoder_config)
+
+        self.layer_norm = nn.LayerNorm(hidden_dim)
+
+        self.regression_or_classification = regression_or_classification
+        if regression_or_classification == "regression":
+            self.proj = nn.Linear(hidden_dim, 3)# x, y, z -> 3
+        elif regression_or_classification == "classification":
+            self.proj_azimuth = nn.Linear(hidden_dim, 128)# 128 bins for azimuth
+            self.mlp_azimuth = MLP(hidden_dim, mlp_dim, 128)
+            self.proj_zenith = nn.Linear(hidden_dim, 64)# 64 bins for zenith
+            self.mlp_zenith = MLP(hidden_dim, mlp_dim, 64)
+        else:
+            raise ValueError("regression_or_classification is a string: 'regression' or 'classification'.")
+
+    def forward(self, x):
+        x = self.icecube_embedding(x)# [batch_size, seq_length, hidden_dim]
+        batch_size = x.shape[0]
+
+        x += self.pos_embedding# [batch_size, seq_length, hidden_dim]
+
+        batch_class_token = self.class_token.expand(batch_size, -1, -1)
+        batch_register_tokens = self.register_tokens.expand(batch_size, -1, -1)
+        x = torch.cat([batch_class_token, batch_register_tokens, x], dim=1)# [batch_size, seq_length+4, hidden_dim]
+
+        x = self.encoder(src_tokens=None, token_embeddings=x)
+        x = x["encoder_out"]# [batch_size, seq_length+4, hidden_dim]
+
+        x = self.layer_norm(x)# [batch_size, seq_length+4, hidden_dim]
+
+        batch_class_token = x[:, 0, :]# [batch_size, hidden_dim]
+        if self.regression_or_classification == "regression":
+            x = self.proj(batch_class_token)# [batch_size, 3]
+        elif self.regression_or_classification == "classification":
+            azimuth = self.proj_azimuth(batch_class_token) + self.mlp_azimuth(batch_class_token)# [batch_size, 128]
+            zenith = self.proj_zenith(batch_class_token) + self.mlp_zenith(batch_class_token)# [batch_size, 64]
+            x = {"azimuth": azimuth, "zenith": zenith}
+
         return x
 
 class IceCubeModel_RegA(nn.Module):
