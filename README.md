@@ -99,3 +99,22 @@ Download [pretrained model](https://github.com/ChenLi2049/ISeeCube/releases/tag/
 - Kaggle solutions, discussions and notebooks are helpful.
 - Thanks to [arxiv-style](https://github.com/kourgeorge/arxiv-style) for such a beautiful LaTeX template.
 - Thanks to many other developers and communicators for their dedication.
+
+##  Citation
+
+If you find this repository useful, please consider citing our work:
+
+```
+@article{iseecube,
+  doi = {10.1088/1748-0221/19/06/T06003},
+  url = {https://dx.doi.org/10.1088/1748-0221/19/06/T06003},
+  year = {2024},
+  publisher = {IOP Publishing},
+  volume = {19},
+  number = {06},
+  pages = {T06003},
+  author = {Chen Li and Hao Cai and Xianyang Jiang},
+  title = {Refine neutrino events reconstruction with BEiT-3},
+  journal = {Journal of Instrumentation}
+}
+```
