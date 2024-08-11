@@ -6,6 +6,8 @@ The goal of this project is to reconstruct the direction of neutrino events dete
 
 ## Install
 
+ISeeCube is on [GraphNeT](https://github.com/graphnet-team/graphnet) now, check it out!
+
 1. Clone the repository:
 
     ```bash
